@@ -16,7 +16,7 @@ public class Wallet {
     @Column(nullable = false, length = 120)
     private String name;
 
-    @Column(nullable = false, length = 254, unique = true)
+    @Column(nullable = false, length = 254)
     private String email;
 
     @Column(nullable = false, precision = 19, scale = 2)
