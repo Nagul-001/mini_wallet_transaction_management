@@ -30,7 +30,8 @@ public class WalletService {
         if (walletRepository.existsByEmailIgnoreCase(normalizedEmail)) throw new DuplicateEmailException(normalizedEmail);
         Wallet wallet = new Wallet(request.name().trim(), normalizedEmail, request.initialBalance());
         try {
-            return WalletResponse.from(walletRepository.saveAndFlush(wallet));
+            walletRepository.saveAndFlush(wallet);
+            return WalletResponse.from(wallet);
         } catch (DataIntegrityViolationException ex) {
             throw new DuplicateEmailException(normalizedEmail);
         }
@@ -53,10 +54,16 @@ public class WalletService {
         Long toId = request.toWalletId();
         if (fromId.equals(toId)) throw new SameWalletTransferException();
 
-        List<Long> ids = new ArrayList<>(List.of(fromId, toId));
-        ids.sort(Comparator.naturalOrder());
-        Wallet first = walletRepository.findByIdForUpdate(ids.get(0)).orElseThrow(() -> new WalletNotFoundException(ids.get(0)));
-        Wallet second = walletRepository.findByIdForUpdate(ids.get(1)).orElseThrow(() -> new WalletNotFoundException(ids.get(1)));
+        Long firstId,secondId;
+        if(fromId < toId){
+            firstId = fromId;
+            secondId = toId;
+        }else {
+            firstId = toId;
+            secondId = fromId;
+        }
+        Wallet first = walletRepository.findByIdForUpdate(firstId).orElseThrow(()-> new WalletNotFoundException(firstId));
+        Wallet second = walletRepository.findByIdForUpdate(secondId).orElseThrow(()-> new WalletNotFoundException(secondId));
         Wallet sender = first.getId().equals(fromId) ? first : second;
         Wallet receiver = first.getId().equals(toId) ? first : second;
 

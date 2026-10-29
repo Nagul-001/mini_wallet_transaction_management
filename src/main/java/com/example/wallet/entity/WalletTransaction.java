@@ -6,9 +6,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "wallet_transaction", indexes = {
-        @Index(name = "idx_wallet_transaction_wallet_created", columnList = "wallet_id, created_at")
-})
+@Table(name = "wallet_transaction")
 @Check(constraints = "amount > 0")
 public class WalletTransaction {
     @Id
